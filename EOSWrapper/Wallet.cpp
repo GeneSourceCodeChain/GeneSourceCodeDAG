@@ -32,13 +32,13 @@ Wallet::~Wallet()
 
 bool Wallet::open(string name,string psw)
 {
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("open");
 	arguments.push_back("-n");
 	arguments.push_back(name);
-	child c(cmd,arguments);
+	child c(cmd,arguments,ec);
 	c.wait();
-	if(EXIT_SUCCESS == c.exit_code()) {
+	if(EXIT_SUCCESS == ec.value()) {
 		walletname = name;
 		password = psw;
 		return true;
@@ -49,25 +49,28 @@ bool Wallet::create(string name)
 {
 	trim(name);
 	if(name.empty()) name = "default";
-	ipstream out;
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("create");
 	arguments.push_back("-n");
 	arguments.push_back(name);
-	child c(cmd,arguments,std_out > out);
+	child c(cmd,arguments,std_out > buf,ios,ec);
+	ios.run();
 	//parse generated password from console
 	string line;
 	regex psw("^\"(.*)\"$");
 	string p;
-	while(out && getline(out,line)) {
-		match_results<string::const_iterator> results;
-		if(regex_match(line,results,psw)) {
-			p = string(results[1].begin(),results[1].end());
-			break;
+	while(buf.valid()) {
+		stringstream sstr;
+		sstr << buf.get();
+		while(getline(sstr,line)) {
+			match_results<string::const_iterator> results;
+			if(regex_match(line,results,psw)) {
+				p = string(results[1].begin(),results[1].end());
+				break;
+			}
 		}
 	}
-	c.wait();
-	if(EXIT_SUCCESS == c.exit_code()) {
+	if(EXIT_SUCCESS == ec.value()) {
 		walletname = name;
 		password = p;
 		return true;
@@ -77,13 +80,13 @@ bool Wallet::create(string name)
 bool Wallet::lock()
 {
 	if(walletname.empty()) return false;
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("lock");
 	arguments.push_back("-n");
 	arguments.push_back(walletname);
-	child c(cmd,arguments);
+	child c(cmd,arguments,ec);
 	c.wait();
-	return (EXIT_SUCCESS == c.exit_code())?true:false;
+	return (EXIT_SUCCESS == ec.value())?true:false;
 }
 
 bool Wallet::unlock()
@@ -92,12 +95,12 @@ bool Wallet::unlock()
 	//check if the account is created by this object, is other word whether we know the password
 	ipstream out;
 	opstream in;
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("unlock");
 	arguments.push_back("-n");
 	arguments.push_back(walletname);
-	child c(cmd,arguments,std_out > out, std_in < in);
-#if 1
+	child c(cmd,arguments,std_out > out, std_in < in,ec);
+#if 0
 	//wait until password prompt is shown
 	string line;
 	while(out && getline(out,line))
@@ -106,23 +109,23 @@ bool Wallet::unlock()
 			break;
 		}
 #else
-	in << pos->second << endl;
+	in << password << endl;
 #endif
 	c.wait();
-	return (EXIT_SUCCESS == c.exit_code())?true:false;
+	return (EXIT_SUCCESS == ec.value())?true:false;
 }
 
 bool Wallet::import(string privatekey)
 {
 	if(walletname.empty()) return false;
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("import");
 	arguments.push_back("-n");
 	arguments.push_back(walletname);
 	arguments.push_back(privatekey);
-	child c(cmd,arguments);
+	child c(cmd,arguments,ec);
 	c.wait();
-	return (EXIT_SUCCESS == c.exit_code())?true:false;
+	return (EXIT_SUCCESS == ec.value())?true:false;
 }
 
 bool Wallet::save(string file)
@@ -146,9 +149,9 @@ bool Wallet::load(string file)
 vector<string> Wallet::list()
 {
 	ipstream out;
-	vector<string> arguments = args;
+	vector<string> arguments(args.begin(),args.end());
 	arguments.push_back("list");
-	child c(cmd,arguments,std_out > out);
+	child c(cmd,arguments,std_out > out,ec);
 	string json;
 	string line;
 	while(out && getline(out,line))

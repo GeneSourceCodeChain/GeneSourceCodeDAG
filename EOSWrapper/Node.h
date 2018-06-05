@@ -3,28 +3,33 @@
 
 #include <string>
 #include <vector>
+#include <system_error>
 #include <boost/filesystem.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/process.hpp>
+#include <boost/asio/io_service.hpp>
 #include "Wallet.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::process;
 using namespace boost::filesystem;
+using namespace boost::asio;
 
 class Node {
 protected:
 	static const path config_dir;
-	ipstream nodeos_out;
 	boost::shared_ptr<child> nodeos;
 	boost::shared_ptr<boost::thread> print_msg_handle;
 	const string nodeoscmd;
 	const string cleoscmd;
 	const vector<string> nodeosargs;
 	const vector<string> cleosargs;
+	io_service ios;
+	future<string> buf;
+	std::error_code ec;
 	//serializable members
 	Wallet wallet;
 	string walletname;

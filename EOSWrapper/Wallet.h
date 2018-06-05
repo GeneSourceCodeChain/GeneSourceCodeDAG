@@ -4,14 +4,20 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <system_error>
+#include <boost/asio/io_service.hpp>
 
 using namespace std;
+using namespace boost::asio;
 
 class Wallet {
 	string address;
 	unsigned short portnum;
 	const string cmd;
 	const vector<string> args;
+	io_service ios;
+	future<string> buf;
+	std::error_code ec;
 	//serializable
 	string walletname;
 	string password;

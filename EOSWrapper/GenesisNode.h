@@ -16,7 +16,7 @@ public:
 	GenesisNode(
 		string name,
 		vector<boost::tuple<string,unsigned short> > peers,
-		string address = "localhost",unsigned short portnum = 8888,
+		string address = "localhost",unsigned short httpportnum = 8888,
 		vector<string> plugins = {
 			"eosio::producer_plugin",
 			"eosio::chain_api_plugin",
