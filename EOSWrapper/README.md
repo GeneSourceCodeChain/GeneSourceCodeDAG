@@ -9,7 +9,8 @@ make
 
 ### how to test
 compile EOSIO and place contract directory under current directory.
-build a testnet with the following command
+
+Then, build a testnet with the following command
 ```Bash
 ./demo
 ```
