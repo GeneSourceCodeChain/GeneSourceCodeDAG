@@ -16,7 +16,8 @@ public:
 			"eosio::producer_plugin",
 			"eosio::chain_api_plugin",
 			"eosio::http_plugin",
-			"eosio::history_api_plugin"
+			"eosio::history_api_plugin",
+			"eosio::net_plugin"
 		}
 	);
 	virtual ~ProducerNode();

@@ -13,6 +13,8 @@ using namespace boost::filesystem;
 using namespace boost::algorithm;
 
 const path Node::config_dir = CONFIGDIR;
+string Node::initial_key = "";
+string Node::initial_timestamp = "";
 
 Node::Node()
 {
@@ -91,9 +93,11 @@ bool Node::create_account(string name,string publickey,string creater)
 	arguments.push_back(name);
 	arguments.push_back(publickey);
 	arguments.push_back("--stake-net");
-	arguments.push_back("\"100000.0000 SYS\"");
+	arguments.push_back("100000.0000 SYS");
 	arguments.push_back("--stake-cpu");
-	arguments.push_back("\"100000.0000 SYS\"");
+	arguments.push_back("100000.0000 SYS");
+	arguments.push_back("--buy-ram-kbytes");
+	arguments.push_back("8");
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;
@@ -120,6 +124,8 @@ bool Node::set_contract(string name,string contract_path)
 	arguments.push_back(contract_path);
 	arguments.push_back("-p");
 	arguments.push_back(name);
+	arguments.push_back("-x");
+	arguments.push_back("60");
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;
@@ -147,6 +153,8 @@ bool Node::call_contract(string name,string action,string args,string authorizer
 	arguments.push_back(args);
 	arguments.push_back("-p");
 	arguments.push_back(authorizer);
+	arguments.push_back("-x");
+	arguments.push_back("60");
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;
@@ -298,7 +306,7 @@ void Node::wait()
 
 void Node::print_message()
 {
-	std::ofstream log("nodeos_log.txt");
+	std::ofstream log(walletname + "_log.txt");
 	ios.run();
 	while(buf.valid()) {
 		log << buf.get();

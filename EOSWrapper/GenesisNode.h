@@ -16,18 +16,19 @@ public:
 	GenesisNode(
 		string name,
 		vector<boost::tuple<string,unsigned short> > peers,
-		string address = "localhost",unsigned short httpportnum = 8888,
+		string address = "0.0.0.0",unsigned short portnum = 9876,unsigned short httpportnum = 8888,
 		vector<string> plugins = {
 			"eosio::producer_plugin",
 			"eosio::chain_api_plugin",
 			"eosio::http_plugin",
-			"eosio::history_api_plugin"
+			"eosio::history_api_plugin",
+			"eosio::net_plugin"
 		}
 	);
 	virtual ~GenesisNode();
 	virtual bool run();
 protected:
-	bool create_account(string accountname,string publickey,string creater);
+	bool create_account_without_smartcontract(string accountname,string publickey,string creater);
 };
 
 #endif

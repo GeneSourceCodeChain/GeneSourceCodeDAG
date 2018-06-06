@@ -30,6 +30,9 @@ protected:
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;
+	//genesis json
+	static string initial_key;
+	static string initial_timestamp;
 	//serializable members
 	Wallet wallet;
 	string walletname;

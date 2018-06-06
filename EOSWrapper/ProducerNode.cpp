@@ -23,11 +23,11 @@ ProducerNode::ProducerNode(
 	wallet.import(get<1>(keypair));
 	//2)launch nodeos
 	vector<string> arguments = nodeosargs;
-	arguments.push_back("-e");
+	arguments.push_back("--enable-stale-production");
 	arguments.push_back("--producer-name");
 	arguments.push_back(name);
 	arguments.push_back("--private-key");
-	arguments.push_back("'[\"" + get<0>(keypair) + "\",\"" + get<1>(keypair) + "\"]'");
+	arguments.push_back("[\"" + get<0>(keypair) + "\",\"" + get<1>(keypair) + "\"]");
 	arguments.push_back("--http-server-address");
 	arguments.push_back(address + ":" + lexical_cast<string>(httpportnum));
 	arguments.push_back("--p2p-listen-endpoint");
@@ -46,6 +46,10 @@ ProducerNode::ProducerNode(
 	arguments.push_back((config_dir / name).string());
 	arguments.push_back("--blocks-dir");
 	arguments.push_back((config_dir / name / "blocks").string());
+	arguments.push_back("--eosio-key");
+	arguments.push_back(initial_key);
+	arguments.push_back("--genesis-timestamp");
+	arguments.push_back(initial_timestamp);
 #ifndef NDEBUG
 	cout<<nodeoscmd<<" ";
 	for(auto & arg : arguments) cout<<arg<<" ";
