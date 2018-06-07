@@ -12,6 +12,8 @@ using namespace std;
 using namespace boost;
 
 class GenesisNode : public Node {
+	string initial_key;
+	string initial_timestamp;
 public:
 	GenesisNode(
 		string name,
@@ -22,11 +24,13 @@ public:
 			"eosio::chain_api_plugin",
 			"eosio::http_plugin",
 			"eosio::history_api_plugin",
-			"eosio::net_plugin"
+			"eosio::net_plugin",
+			"eosio::net_api_plugin"
 		}
 	);
 	virtual ~GenesisNode();
 	virtual bool run();
+	string get_configure();
 protected:
 	bool create_account_without_smartcontract(string accountname,string publickey,string creater);
 };

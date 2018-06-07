@@ -5,12 +5,15 @@
 #include <boost/thread/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include "GenesisNode.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 using namespace boost::posix_time;
+using namespace boost::property_tree;
 
 GenesisNode::GenesisNode(
 	string name,
@@ -33,14 +36,17 @@ GenesisNode::GenesisNode(
 	sstr.imbue(locale(locale::classic(),facet));
 	sstr<<time;
 	sstr>>initial_timestamp;
+	string json = get_configure();
+	std::ofstream out((config_dir / name / "genesis.json").string());
+	out<<json;
+	out.close();
 	//2)setup minimum necessary arguments
 	vector<string> arguments(nodeosargs.begin(),nodeosargs.end());
 	arguments.push_back("--enable-stale-production");
 	arguments.push_back("--producer-name");
 	arguments.push_back(name);
 	//we use self created keypair as keys for eosio account
-	arguments.push_back("--private-key");
-	arguments.push_back("[\"" + get<1>(eosio_keypair) + "\",\"" + get<2>(eosio_keypair) + "\"]");
+	arguments.push_back("--signature-provider=" + get<1>(eosio_keypair) + "=KEY:" + get<2>(eosio_keypair));
 	arguments.push_back("--http-server-address");
 	arguments.push_back(address + ":" + lexical_cast<string>(httpportnum));
 	arguments.push_back("--p2p-listen-endpoint");
@@ -57,15 +63,15 @@ GenesisNode::GenesisNode(
 	arguments.push_back((config_dir / name).string());
 	arguments.push_back("--data-dir");
 	arguments.push_back((config_dir / name).string());
-	arguments.push_back("--genesis-timestamp");
-	arguments.push_back(initial_timestamp);
+	arguments.push_back("--genesis-json");
+	arguments.push_back((config_dir / name / "genesis.json").string());
 	//3)launch nodeos
 #ifndef NDEBUG
 	cout<<nodeoscmd<<" ";
 	for(auto & arg : arguments) cout<<arg<<" ";
 	cout<<endl;
 #endif
-	nodeos = boost::shared_ptr<child>(new child(nodeoscmd,arguments,std_err > buf,ios,ec));
+	nodeos = boost::shared_ptr<child>(new child(nodeoscmd,arguments,std_out > buf,ios,ec));
 	print_msg_handle = boost::shared_ptr<boost::thread>(new boost::thread(bind(&Node::print_message,this)));
 	boost::this_thread::sleep(seconds(1));
 }
@@ -98,6 +104,37 @@ bool GenesisNode::run()
 	retval = set_contract("eosio","./contracts/eosio.system");
 	retval = call_contract("eosio","setpriv","[\"eosio.msig\",1]","eosio@active");
 	return true;
+}
+
+string GenesisNode::get_configure()
+{
+	ptree json;
+	json.put("initial_timestamp",initial_timestamp);
+	json.put("initial_key",initial_key);
+	json.put("initial_chain_id","0000000000000000000000000000000000000000000000000000000000000000");
+	ptree configure;
+	configure.put("max_block_net_usage",1048576);
+	configure.put("target_block_net_usage_pct",1000);
+	configure.put("max_transaction_net_usage",524288);
+	configure.put("base_per_transaction_net_usage",12);
+	configure.put("net_usage_leeway",500);
+	configure.put("context_free_discount_net_usage_num",20);
+	configure.put("context_free_discount_net_usage_den",100);
+	configure.put("max_block_cpu_usage",100000);
+	configure.put("target_block_cpu_usage_pct",500);
+	configure.put("max_transaction_cpu_usage",50000);
+	configure.put("min_transaction_cpu_usage",100);
+	configure.put("max_transaction_lifetime",3600);
+	configure.put("deferred_trx_expiration_window",600);
+	configure.put("max_transaction_delay",3888000);
+	configure.put("max_inline_action_size",4096);
+	configure.put("max_inline_action_depth",4);
+	configure.put("max_authority_depth",6);
+	configure.put("max_generated_transaction_count",16);
+	json.add_child("initial_configuration",configure);
+	stringstream retval;
+	write_json(retval,json);
+	return retval.str();
 }
 
 bool GenesisNode::create_account_without_smartcontract(string accountname,string publickey,string creater)

@@ -13,8 +13,6 @@ using namespace boost::filesystem;
 using namespace boost::algorithm;
 
 const path Node::config_dir = CONFIGDIR;
-string Node::initial_key = "";
-string Node::initial_timestamp = "";
 
 Node::Node()
 {
@@ -124,8 +122,8 @@ bool Node::set_contract(string name,string contract_path)
 	arguments.push_back(contract_path);
 	arguments.push_back("-p");
 	arguments.push_back(name);
-	arguments.push_back("-x");
-	arguments.push_back("60");
+//	arguments.push_back("-x");
+//	arguments.push_back("60");
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;
@@ -153,8 +151,8 @@ bool Node::call_contract(string name,string action,string args,string authorizer
 	arguments.push_back(args);
 	arguments.push_back("-p");
 	arguments.push_back(authorizer);
-	arguments.push_back("-x");
-	arguments.push_back("60");
+//	arguments.push_back("-x");
+//	arguments.push_back("60");
 	io_service ios;
 	future<string> buf;
 	std::error_code ec;

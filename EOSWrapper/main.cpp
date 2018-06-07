@@ -17,14 +17,17 @@ int main()
 	GenesisNode genesis(
 		"genesis",
 		{
+#if 0
 			boost::make_tuple("127.0.0.1",9011),
 			boost::make_tuple("127.0.0.1",9012),
 			boost::make_tuple("127.0.0.1",9013),
 			boost::make_tuple("127.0.0.1",9014)
+#endif
 		},
-		"127.0.0.1",9010,8010
+		"0.0.0.0",9876,8888
 	);
 	genesis.run();
+	string json = genesis.get_configure();
 	boost::tuple<bool,string,string> retval1 = genesis.create_keypair(); assert(get<0>(retval1));
 	boost::tuple<bool,string,string> retval2 = genesis.create_keypair(); assert(get<0>(retval2));
 	boost::tuple<bool,string,string> retval3 = genesis.create_keypair(); assert(get<0>(retval3));
@@ -40,9 +43,9 @@ int main()
 	//create producer nodes what link to genesis node
 	ProducerNode producer1(
 		"prod1",
-		boost::make_tuple(get<1>(retval1),get<2>(retval1)),
+		boost::make_tuple(get<1>(retval1),get<2>(retval1)),json,
 		{
-			boost::make_tuple("127.0.0.1",9010),
+			boost::make_tuple("0.0.0.0",9876),
 			boost::make_tuple("127.0.0.1",9012),
 			boost::make_tuple("127.0.0.1",9013),
 			boost::make_tuple("127.0.0.1",9014)
@@ -52,44 +55,44 @@ int main()
 	producer1.run();
 	ProducerNode producer2(
 		"prod2",
-		boost::make_tuple(get<1>(retval2),get<2>(retval2)),
+		boost::make_tuple(get<1>(retval2),get<2>(retval2)),json,
 		{
-			boost::make_tuple("127.0.0.1",9010),
+			boost::make_tuple("0.0.0.0",9876),
 			boost::make_tuple("127.0.0.1",9011),
 			boost::make_tuple("127.0.0.1",9013),
 			boost::make_tuple("127.0.0.1",9014)
 		},
-		"localhost",9012,8012
+		"127.0.0.1",9012,8012
 	);
 	producer2.run();
 	ProducerNode producer3(
 		"prod3",
-		boost::make_tuple(get<1>(retval3),get<2>(retval3)),
+		boost::make_tuple(get<1>(retval3),get<2>(retval3)),json,
 		{
-			boost::make_tuple("127.0.0.1",9010),
+			boost::make_tuple("0.0.0.0",9876),
 			boost::make_tuple("127.0.0.1",9011),
 			boost::make_tuple("127.0.0.1",9012),
 			boost::make_tuple("127.0.0.1",9014)
 		},
-		"localhost",9013,8013
+		"127.0.0.1",9013,8013
 	);
 	producer3.run();
 	ProducerNode producer4(
 		"prod4",
-		boost::make_tuple(get<1>(retval4),get<2>(retval4)),
+		boost::make_tuple(get<1>(retval4),get<2>(retval4)),json,
 		{
-			boost::make_tuple("127.0.0.1",9010),
+			boost::make_tuple("0.0.0.0",9876),
 			boost::make_tuple("127.0.0.1",9011),
 			boost::make_tuple("127.0.0.1",9012),
 			boost::make_tuple("127.0.0.1",9013)
 		},
-		"localhost",9014,8014
+		"127.0.0.1",9014,8014
 	);
 	producer4.run();
 	//2)voting
-	genesis.vote_producers({"prod1"},"prod1");
-	genesis.vote_producers({"prod1"},"prod2");
-	genesis.vote_producers({"prod1"},"prod3");
+	genesis.vote_producers({"prod2"},"prod1");
+	genesis.vote_producers({"prod3"},"prod2");
+	genesis.vote_producers({"prod4"},"prod3");
 	genesis.vote_producers({"prod1"},"prod4");
 	//3)wait for running nodes
 	genesis.wait();
