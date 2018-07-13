@@ -8,4 +8,12 @@ The library contains the following components
 
 Wrapper library which controls the EOS.IO toolkits. The demo provide an example of how to start a multi-node testnet.
 
+2) EOS launcher scripts (EOSDeployer)
+
+scripts for launching EOS testnet in one command
+
+3) ETH launcher scripts (ETHDeployer)
+
+scripts for launching ETH testnet easily
+
 
