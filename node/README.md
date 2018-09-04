@@ -1,23 +1,24 @@
-# 启动主节点流程
-1. 编辑config/config.ini文件，做如下修改
+# steps to launch candidate block producer node
 
-设置json rpc服务变量http-server-address = \<自己主机ip\>:\<任选port\>
+1. edit config/config.ini and do the following modifications
 
-设置p2p服务变量p2p-listen-endpoint = \<自己主机ip\>:\<任选port\>
+set up variables related to json rpc server, http-server-address = \<your own ip\>:\<any available port\>
 
-用自己注册的账户名设置变量producer-name = \<帐号名（需要注册联系微信breadbread1984）\>
+set up variables related to p2p server, p2p-listen-endpoint = \<your own ip\>:\<any available port\>
 
-用自己公钥私钥设置变量signature-provider = \<公钥\>=KEY:\<私钥\>
+set up the following variable with your own account, producer-name = \<account（contact breadbread1984 for registration）\>
 
-2. 启动节点服务
+set up the following variable with your own public and private key, signature-provider = \<public key\>=KEY:\<private key\>
 
-运行runnodeos.sh脚本。
+2. launch node service
 
-3. 启动本地钱包服务
+run script runnodeos.sh
 
-运行脚本runkeosd.sh脚本
+3. launch local wallet service
 
-4. 使用方法
+run script runkeosd.sh
+
+4. usage
 
 ```bash
 cleos --wallet-url http://localhost:6666 -u http://<ip>:<port>  <eosio cmd>
