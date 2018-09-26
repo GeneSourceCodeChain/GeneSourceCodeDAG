@@ -1,0 +1,36 @@
+
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+
+int main(){
+  int num, numprimes = 1;
+  int *primes,*temp; // i'm not sure if temp will be necessary to prevent memory leaks maybe someone could tell me
+  bool prime;
+
+  primes = (int*)malloc(1*sizeof(int));
+  primes[0] = 2;
+
+  cout << "Please enter a positive integer" << endl;
+  cin >> num;
+
+  for(int i = 3; i <= num; i++){
+    prime = true;
+    for(int n = 0; n < numprimes; n++){
+      if(i % primes[n] == 0){  /* if it is divisible by a compound number, then it was definitely divisible  */
+        prime = false;
+        break;                 
+      }
+    }
+    if(prime){
+      cout << i << " is prime" << endl;
+      temp = (int*)realloc(primes,(++numprimes)*sizeof(int));
+      if(temp != primes) free(primes);
+      primes = temp;
+      primes[numprimes-1] = i;
+    }
+  }
+
+  return 0;
+}
+
