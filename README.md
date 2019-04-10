@@ -9,11 +9,10 @@ This project is to implement a library managing DAG objects such as block chain,
 
 This project is going to proceed in triple steps:
 
-1. first phase: We investigate several existing blockchain systems. We choose one among them on which we build Gene Source Code Chain 1.0.
-2. second phase: We do modifications including decentralized storage, proof of storage and a better consensus algorithm to the chosed blockchain to enable genomic data storage and sharing.
-3. last phase: We are going to independently implement a novel blockchain system to serve the Gene Source Code Chain ecosystem.
+1. first phase: We will build a DApp with EOS, and gradually develop Marketing functions and Sharing functions
+2. second phase: We will do relevant research on existing public chain and future blockchain multilayer structure, and choose a viable path to achieve the required functions of Gene Source Code Chain Structure.
+3. third phase: We are going to implement a blockchain system or a layer structure to serve the Gene Source Code Chain ecosystem
 
-We are in the second phase in which we modify EOS.IO to get Gene Source Code Chain 2.0. The following sub projects are what we are doing.
 
 1) EOS.IO wrapper (EOSWrapper)
 
